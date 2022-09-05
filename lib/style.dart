@@ -13,7 +13,13 @@ var theme = ThemeData(
     style: TextButton.styleFrom(
       primary: Colors.black,
     )
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      fixedSize: Size(20,80)
+    )
   )
+
 
 
 );
