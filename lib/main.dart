@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:stock_manager/WebCrawling.dart';
 import 'package:stock_manager/drawer.dart';
 import './style.dart' as style;
-import 'package:sizer/sizer.dart';
+// import 'package:sizer/sizer.dart';
 import './Content.dart';
+import "package:http/http.dart" as http;
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart';
+import "dart:convert";
+import 'package:permission_handler/permission_handler.dart';
+
+
 
 List<DropdownMenuItem<String>> get dropdownItems{
   List<DropdownMenuItem<String>> menuItems = [
@@ -25,6 +33,8 @@ void main() {
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -38,6 +48,43 @@ class _MyAppState extends State<MyApp> {
   var listOption = [];
   var keyword;
 
+
+
+  getVideoData() async {
+    var thumbnail;
+    var href = "";
+    var data;
+    await(http.get(Uri.parse("https://www.youtube.com/results?search_query=$keyword")))
+        .then((value) => data = value);
+    var data2 = jsonDecode(data);
+    print('???');
+  }
+
+  getImgData() async {
+
+    var data;
+    await(http.get(Uri.parse("https://www.google.com/search?q=$keyword&tbm=isch&source=lnms&sa=X")))
+        .then((value) => data = value);
+    data = jsonDecode(data);
+
+  }
+
+  getArticleData() async {
+    var data;
+    data = await(http.get(Uri.parse("https://www.google.com/search?q=$keyword&source=lnms&tbm=nws")));
+    if (data.statusCode == 200){
+      dom.Document document = parse(data.body);
+      print(document.outerHtml);
+      final temp = document.getElementsByClassName('MjjYud');
+      var href = temp.map((element)=>element.getElementsByTagName('a')[0].innerHtml).toList();
+      print(href);
+      // print(temp);
+      // print(document.getElementsByClassName("xuvV6b BGxR7d"));
+    } else {
+      throw Exception();
+    }
+
+  }
 
   Keyword(e){
     setState(() {
@@ -69,6 +116,7 @@ class _MyAppState extends State<MyApp> {
     // TODO: implement initState
     super.initState();
   }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -110,7 +158,11 @@ class _MyAppState extends State<MyApp> {
                     flex: 4,
                       child: DropdownButton(
                         value: selected,
-                        onChanged: (String? e){},
+                        onChanged: (e){
+                          setState(() {
+                            selected = e.toString();
+                          });
+                        },
                         items: dropdownItems,
                       )
                   ),
@@ -123,6 +175,8 @@ class _MyAppState extends State<MyApp> {
                         onPressed: () {
                           if(keyword != '' && keyword != null){
                             addKeyword();
+                            getArticleData();
+                            // WebCrawling(keyword:keyword, selected:selected);
                           }
                         },
                         child: Align(

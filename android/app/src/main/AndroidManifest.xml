@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kapurichino.stock_manager">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="stock_manager"
         android:name="${applicationName}"
