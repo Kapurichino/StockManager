@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Content extends StatelessWidget {
   const Content({Key? key, this.listKeyword, this.listOption, this.removeKeyword, this.index, this.title, this.link, this.thumb}) : super(key: key);
@@ -15,7 +16,6 @@ class Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(listKeyword);
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Container(
@@ -57,7 +57,29 @@ class Content extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
                 child: Swiper(
                   itemBuilder: (BuildContext context, int index) {
-                    return Image.network(thumb[index]);
+                    print(link[index]);
+                    return Container(
+
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.network(thumb[index]),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextButton(onPressed: (){
+                               launchUrl(Uri.parse(link[index]));
+                              }, child: Wrap(
+                                direction: Axis.vertical,
+                                children: [
+                                  Text('아')
+                                ],
+                              ))
+                            ],
+                          )
+                        ],
+                      ),
+                    );
                   },
                   autoplay: true,
                   itemCount: 10,
