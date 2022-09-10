@@ -9,7 +9,6 @@ import "package:http/http.dart" as http;
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import "dart:convert";
-import 'package:permission_handler/permission_handler.dart';
 
 
 
@@ -47,7 +46,10 @@ class _MyAppState extends State<MyApp> {
   var listKeyword = [];
   var listOption = [];
   var keyword;
-
+  var link;
+  var title;
+  var thumb;
+  var get = false;
 
 
   getVideoData() async {
@@ -71,13 +73,24 @@ class _MyAppState extends State<MyApp> {
 
   getArticleData() async {
     var data;
-    data = await(http.get(Uri.parse("https://www.google.com/search?q=$keyword&source=lnms&tbm=nws")));
+    data = await(http.get(Uri.parse("https://search.naver.com/search.naver?where=news&sm=tab_jum&query=$keyword")));
     if (data.statusCode == 200){
-      dom.Document document = parse(data.body);
-      print(document.outerHtml);
-      final temp = document.getElementsByClassName('MjjYud');
-      var href = temp.map((element)=>element.getElementsByTagName('a')[0].innerHtml).toList();
-      print(href);
+      final document = parse(data.body);
+      link = document.getElementsByClassName('news_tit')
+          .where((e) => e.attributes.containsKey('href'))
+          .map((e) => e.attributes['href'])
+          .toList();
+      title = document.getElementsByClassName('news_tit')
+          .where((e) => e.attributes.containsKey('href'))
+          .map((e) => e.innerHtml)
+          .toList();
+      thumb = document.getElementsByClassName('thumb api_get')
+          .where((e) => e.attributes.containsKey('src'))
+          .map((e) => e.attributes['src'])
+          .toList();
+      setState(() {
+        get = true;
+      });
       // print(temp);
       // print(document.getElementsByClassName("xuvV6b BGxR7d"));
     } else {
@@ -194,8 +207,8 @@ class _MyAppState extends State<MyApp> {
                   shrinkWrap: true,
                   itemCount: listCount,
                   itemBuilder: (context, index){
-                    return Content(listKeyword : listKeyword, listOption : listOption,
-                      removeKeyword: removeKeyword, index: index);
+                    return get ? Content(listKeyword : listKeyword, listOption : listOption, title : title, link : link, thumb : thumb,
+                      removeKeyword: removeKeyword, index: index) : CircularProgressIndicator();
                   }
               ),
             )
