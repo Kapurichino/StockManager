@@ -49,26 +49,40 @@ class _MyAppState extends State<MyApp> {
   var link;
   var title;
   var thumb;
-  var get = false;
+  var get = [false];
+  var images;
 
 
   getVideoData() async {
-    var thumbnail;
-    var href = "";
     var data;
-    await(http.get(Uri.parse("https://www.youtube.com/results?search_query=$keyword")))
-        .then((value) => data = value);
-    var data2 = jsonDecode(data);
-    print('???');
+    data = await(http.get(Uri.parse("https://search.naver.com/search.naver?where=image&sm=tab_jum&query=$keyword")));
+    if (data.statusCode == 200){
+      final document = parse(data.body);
+      images = document.getElementsByClassName('image _listImage')
+          .where((e) => e.attributes.containsKey('src'))
+          .map((e) => e.attributes['src'])
+          .toList();
+      setState(() {
+        get[listCount-1] = true;
+        get.add(false);
+      });
+    }
   }
 
   getImgData() async {
-
     var data;
-    await(http.get(Uri.parse("https://www.google.com/search?q=$keyword&tbm=isch&source=lnms&sa=X")))
-        .then((value) => data = value);
-    data = jsonDecode(data);
-
+    data = await(http.get(Uri.parse("https://search.naver.com/search.naver?where=image&sm=tab_jum&query=$keyword")));
+    if (data.statusCode == 200){
+      final document = parse(data.body);
+      images = document.querySelectorAll('.thumb > img')
+          .where((e) => e.attributes.containsKey('src'))
+          .map((e) => e.attributes['src'])
+          .toList();
+      setState(() {
+        get[listCount-1] = true;
+        get.add(false);
+      });
+    }
   }
 
   getArticleData() async {
@@ -89,7 +103,8 @@ class _MyAppState extends State<MyApp> {
           .map((e) => e.attributes['src'])
           .toList();
       setState(() {
-        get = true;
+        get[listCount-1] = true;
+        get.add(false);
       });
       // print(temp);
       // print(document.getElementsByClassName("xuvV6b BGxR7d"));
@@ -188,7 +203,13 @@ class _MyAppState extends State<MyApp> {
                         onPressed: () {
                           if(keyword != '' && keyword != null){
                             addKeyword();
-                            getArticleData();
+                            listOption[listCount-1] == 'Article'
+                                ? getArticleData()
+                                : listOption[listCount-1] == 'Img'
+                                ? getImgData()
+                                : listOption[listCount-1] == 'Video'
+                                ? getVideoData()
+                                : null;
                             // WebCrawling(keyword:keyword, selected:selected);
                           }
                         },
@@ -207,8 +228,8 @@ class _MyAppState extends State<MyApp> {
                   shrinkWrap: true,
                   itemCount: listCount,
                   itemBuilder: (context, index){
-                    return get ? Content(listKeyword : listKeyword, listOption : listOption, title : title, link : link, thumb : thumb,
-                      removeKeyword: removeKeyword, index: index) : CircularProgressIndicator();
+                    return get[index] ? Content(listKeyword : listKeyword, listOption : listOption, title : title, link : link, thumb : thumb, images : images,
+                      removeKeyword: removeKeyword, externalIndex: index) : CircularProgressIndicator();
                   }
               ),
             )

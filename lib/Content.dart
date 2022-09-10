@@ -4,14 +4,15 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Content extends StatelessWidget {
-  const Content({Key? key, this.listKeyword, this.listOption, this.removeKeyword, this.index, this.title, this.link, this.thumb}) : super(key: key);
+  const Content({Key? key, this.listKeyword, this.listOption, this.removeKeyword, this.externalIndex, this.title, this.link, this.thumb, this.images}) : super(key: key);
   final listKeyword;
   final listOption;
   final removeKeyword;
-  final index;
+  final externalIndex;
   final title;
   final link;
   final thumb;
+  final images;
 
 
   @override
@@ -19,7 +20,7 @@ class Content extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Container(
-        height: 200,
+        height: 300,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(
@@ -40,12 +41,12 @@ class Content extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("${listKeyword[index]}    - ${listOption[index]} -", style: TextStyle(
+                  Text("${listKeyword[externalIndex]}    - ${listOption[externalIndex]} -", style: TextStyle(
                     fontSize: 20
                   ),),
                   IconButton(
                       onPressed: (){
-                        removeKeyword(listKeyword[index], listOption[index]);
+                        removeKeyword(listKeyword[externalIndex], listOption[externalIndex]);
                       },
                       icon: FaIcon(FontAwesomeIcons.trash)
                   )
@@ -57,29 +58,40 @@ class Content extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
                 child: Swiper(
                   itemBuilder: (BuildContext context, int index) {
-                    print(link[index]);
-                    return Container(
-
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    if (listOption[externalIndex] == 'Article'){
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.network(thumb[index]),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          TextButton(onPressed: (){
+                            launchUrl(Uri.parse(link[index]));
+                          }, child: Wrap(
+                            direction: Axis.vertical,
                             children: [
-                              TextButton(onPressed: (){
-                               launchUrl(Uri.parse(link[index]));
-                              }, child: Wrap(
-                                direction: Axis.vertical,
-                                children: [
-                                  Text('아')
-                                ],
-                              ))
+                              Text(title[index])
                             ],
-                          )
+                          ))
                         ],
-                      ),
-                    );
+                      );
+                    }
+                    else if (listOption[externalIndex] == 'Img'){
+                      return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.network(images[index]),
+                          ]
+                        );
+                    }
+                    else if (listOption[externalIndex] == 'Video'){
+                      return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+                          ]
+                      );
+                    }
+                    else
+                      return null;
                   },
                   autoplay: true,
                   itemCount: 10,
