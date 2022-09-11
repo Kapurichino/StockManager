@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:stock_manager/WebCrawling.dart';
@@ -51,17 +53,27 @@ class _MyAppState extends State<MyApp> {
   var thumb;
   var get = [false];
   var images;
+  var sample;
 
 
   getVideoData() async {
     var data;
-    data = await(http.get(Uri.parse("https://search.naver.com/search.naver?where=image&sm=tab_jum&query=$keyword")));
+    data = await(http.get(Uri.parse("https://www.youtube.com/results?search_query=$keyword")));
     if (data.statusCode == 200){
       final document = parse(data.body);
-      images = document.getElementsByClassName('image _listImage')
-          .where((e) => e.attributes.containsKey('src'))
-          .map((e) => e.attributes['src'])
+      sample = document.getElementById('content');
+      link = document.querySelectorAll('#dismissible > #thumbnail')
+          .where((e) => e.attributes.containsKey('href'))
+          .map((e) => e.attributes['href'])
           .toList();
+      title = document.querySelectorAll('#title-wrapper > #video-title')
+            .where((e) => e.attributes.containsKey('title'))
+            .map((e) => e.attributes['title'])
+            .toList();
+      thumb = document.querySelectorAll('#dismissible > #thumbnail > #img')
+            .where((e) => e.attributes.containsKey('src'))
+            .map((e) => e.attributes['src'])
+            .toList();
       setState(() {
         get[listCount-1] = true;
         get.add(false);
@@ -71,7 +83,7 @@ class _MyAppState extends State<MyApp> {
 
   getImgData() async {
     var data;
-    data = await(http.get(Uri.parse("https://search.naver.com/search.naver?where=image&sm=tab_jum&query=$keyword")));
+    data = await(http.get(Uri.parse("https://search.naver.com/search.naver?where=image&sm=tab_jum&query=$keyword"))).catchError((error){print(error);});
     if (data.statusCode == 200){
       final document = parse(data.body);
       images = document.querySelectorAll('.thumb > img')

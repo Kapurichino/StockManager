@@ -41,7 +41,7 @@ class Content extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("${listKeyword[externalIndex]}    - ${listOption[externalIndex]} -", style: TextStyle(
+                  Text("${listKeyword[externalIndex]}      - ${listOption[externalIndex]} -", style: TextStyle(
                     fontSize: 20
                   ),),
                   IconButton(
@@ -78,7 +78,9 @@ class Content extends StatelessWidget {
                       return Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Image.network(images[index]),
+                            Image.network(
+                                images[index],
+                            ),
                           ]
                         );
                     }
@@ -86,7 +88,15 @@ class Content extends StatelessWidget {
                       return Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-
+                            Image.network(thumb[index]),
+                            TextButton(onPressed: (){
+                              launchUrl(Uri.parse(link[index]));
+                            }, child: Wrap(
+                              direction: Axis.vertical,
+                              children: [
+                                Text(title[index])
+                              ],
+                            ))
                           ]
                       );
                     }
